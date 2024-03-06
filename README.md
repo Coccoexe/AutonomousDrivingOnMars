@@ -8,3 +8,6 @@ The main topic is ...
 ### Contributors
 - Alessio Cocco
 - Umberto Salviati
+
+### Supervisor
+- Prof. Loris Nanni
