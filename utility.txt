@@ -1,0 +1,3 @@
+foundation model: https://depth-anything.github.io/
+
+python run.py --encoder vits --img-path ..\..\dataset\ai4mars-dataset-merged-0.1\msl\images\edr\train\ --outdir trainDepth --pred-only --grayscale
