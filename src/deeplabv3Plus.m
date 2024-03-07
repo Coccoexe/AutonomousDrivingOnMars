@@ -8,11 +8,11 @@ images_test = 'images/edr/test';
 label_train = 'labels/train';
 label_test = 'labels/test/masked-gold-min2-100agree';
 
-image_size = [1024, 1024, 3];
+image_size = [255, 255, 3];
 numClasses = 5;
 
 % create datastore
-transform = @(img) cat(3, imread(img), imread(img), imread(img)); 
+transform = @(img) imresize(cat(3, imread(img), imread(img), imread(img)), image_size(1:2));
 imds = imageDatastore(fullfile(dataset_folder, images_train), "ReadFcn", transform);
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
@@ -33,3 +33,8 @@ options = trainingOptions('adam', ...
 
 cds = combine(imds,pxds);
 net = trainNetwork(cds, layers, options);
+
+%for i = 1:10
+%    read(imds)
+%end
+%img = read(imds);
