@@ -4,7 +4,7 @@ import urllib.request
 
 # CONSTANTS
 
-DATA_FOLDER = os.path.dirname(os.getcwd()) + "/dataset/"
+DATA_FOLDER = os.getcwd() + "/dataset/"
 URL = "https://data.nasa.gov/download/cykx-2qix/application%2Fzip"
 FILENAME = urllib.request.urlopen(URL).url.split("filename=")[-1]
 DOWNLOAD_ATTEMPTS = 3
