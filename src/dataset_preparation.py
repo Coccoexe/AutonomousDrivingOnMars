@@ -4,7 +4,7 @@ import urllib.request
 
 # CONSTANTS
 
-DATA_FOLDER = os.getcwd() + "/dataset/"
+DATA_FOLDER = os.path.dirname(os.getcwd()) + "/dataset/"
 URL = "https://data.nasa.gov/download/cykx-2qix/application%2Fzip"
 FILENAME = urllib.request.urlopen(URL).url.split("filename=")[-1]
 DOWNLOAD_ATTEMPTS = 3
@@ -38,8 +38,8 @@ def rearrange_dataset() -> None:
     print("Rearranging dataset...")
 
     # get list of files
-    train = [file.replace('.png','') for file in os.listdir(DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/labels/train") if file.endswith(".png")]
-    test  = [file.replace('_merged.png','') for file in os.listdir(DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/labels/test/masked-gold-min1-100agree") if file.endswith(".png")]
+    train = [file.replace('.png','') for file in os.listdir(DATA_FOLDER + "ai4mars-dataset-merged-0.1/msl/labels/train") if file.endswith(".png")]
+    test  = [file.replace('_merged.png','') for file in os.listdir(DATA_FOLDER + "ai4mars-dataset-merged-0.1/msl/labels/test/masked-gold-min1-100agree") if file.endswith(".png")]
 
     images_path = DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/images/edr/"
     if not os.path.exists(images_path + "train/"):
