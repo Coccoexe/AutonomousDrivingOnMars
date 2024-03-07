@@ -12,7 +12,8 @@ image_size = [1024, 1024, 3];
 numClasses = 5;
 
 % create datastore
-transform = @(img) cat(3, imread(img), imread(img), imread(img)); 
+% duplicate channels
+transform = @(img) cat(3, img, img, img); 
 imds = imageDatastore(fullfile(dataset_folder, images_train), "ReadFcn", transform);
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
@@ -32,4 +33,9 @@ options = trainingOptions('adam', ...
     'Plots', 'training-progress');
 
 cds = combine(imds,pxds);
-net = trainNetwork(cds, layers, options);
+%net = trainNetwork(cds, layers, options);
+
+for i = 1:10
+    read(imds);
+end
+img = read(imds);
