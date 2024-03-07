@@ -16,7 +16,9 @@ transform = @(img) imresize(cat(3, imread(img), imread(img), imread(img)), image
 imds = imageDatastore(fullfile(dataset_folder, images_train), "ReadFcn", transform);
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
-pxds = pixelLabelDatastore(fullfile(dataset_folder, label_train), classes, labelIDs);
+transform_labels = @(img) imresize(imread(img), image_size(1:2));
+pxds = pixelLabelDatastore(fullfile(dataset_folder, label_train), classes, labelIDs, "ReadFcn", transform_labels);
+
 
 
 % import network
