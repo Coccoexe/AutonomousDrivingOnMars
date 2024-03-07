@@ -33,6 +33,30 @@ def unzip_dataset() -> None:
         zip_ref.extractall(DATA_FOLDER)
     print("Dataset unzipped.")
 
+# Note that this function is specific to the dataset used in this project
+def rearrange_dataset() -> None:
+    print("Rearranging dataset...")
+
+    # get list of files
+    train = [file.replace('.png','') for file in os.listdir(DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/labels/train") if file.endswith(".png")]
+    test  = [file.replace('_merged.png','') for file in os.listdir(DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/labels/test/masked-gold-min1-100agree") if file.endswith(".png")]
+
+    images_path = DATA_FOLDER + "/ai4mars-dataset-merged-0.1/msl/images/edr/"
+    if not os.path.exists(images_path + "train/"):
+        os.makedirs(images_path + "train/")
+    if not os.path.exists(images_path + "test/"):
+        os.makedirs(images_path + "test/")
+
+    for file in train:
+        if not os.path.exists(images_path + file + ".jpg"): continue
+        os.rename(images_path + file + ".jpg", images_path + "train/" + file + ".jpg")
+    for file in test:
+        if not os.path.exists(images_path + file + ".jpg"): continue
+        os.rename(images_path + file + ".jpg", images_path + "test/" + file + ".jpg")
+
+    print("Dataset rearranged.")
+    return
+
 def main():
 
     if not os.path.exists(DATA_FOLDER):
@@ -49,6 +73,9 @@ def main():
         unzip_dataset()
     else:
         print("Dataset already unzipped, avoiding unzip.")
+
+    # Rearrange dataset
+    rearrange_dataset()
 
     return
 
