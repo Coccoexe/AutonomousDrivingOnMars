@@ -12,7 +12,7 @@ image_size = [1024, 1024, 3];
 numClasses = 5;
 
 % create datastore
-imds = imageDatastore(fullfile(dataset_folder, label_train));
+imds = imageDatastore(fullfile(dataset_folder, images_train));
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
 pxds = pixelLabelDatastore(fullfile(dataset_folder, label_train), classes, labelIDs);
@@ -31,4 +31,4 @@ options = trainingOptions('adam', ...
     'Plots', 'training-progress');
 
 cds = combine(imds,pxds);
-%net = trainNetwork(cds, layers, options);
+net = trainNetwork(cds, layers, options);
