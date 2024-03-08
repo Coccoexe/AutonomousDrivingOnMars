@@ -7,10 +7,13 @@ train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
+net_folder     = 'src/deeplabv3plus/trained_networks';
+
 
 image_size  = [256, 256, 3];
 numClasses  = 5;
 divideRatio = 0.8; % #images on train, validation is 1-divideRation
+epochPerTrain = 2;
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
 images = dir(fullfile(train_folder, '*.png'));
@@ -31,20 +34,35 @@ pxds_val   = pixelLabelDatastore(fullfile(ltrain_folder, val), classes, labelIDs
 train_cds = combine(imds_train,pxds_train);
 val_cds   = combine(imds_val,pxds_val);
 
-% import network
-layers = deeplabv3plusLayers(image_size, numClasses, 'resnet18');
+validation_freq = floor(length(train)/8);
+
+% network checkpoint
+if ~exist(net_folder, 'dir')
+    mkdir(net_folder);
+end
+% load network if exists
+if exist(strcat(net_folder, '/deeplabv3plus_resnet18.mat'), 'file')
+    load(strcat(net_folder, '/deeplabv3plus_resnet18.mat'),'net');
+else
+    % import network
+    layers = deeplabv3plusLayers(image_size, numClasses, 'resnet18');
+end
 
 % train network
-options = trainingOptions('adam', ...
+options = trainingOptions('sgdm', ...
     'InitialLearnRate', 1e-3, ...
-    'MaxEpochs', 100, ...
+    'MaxEpochs', epochPerTrain, ...
     'MiniBatchSize', 8, ...
     'ValidationData', val_cds, ...
+    'ValidationFrequency', validation_freq, ...
     'Shuffle', 'every-epoch', ...
-    'Verbose', true, ...
+    'Verbose', false, ...
     'Plots', 'training-progress');
 
 net = trainNetwork(train_cds, layers, options);
+
+% save network
+save(strcat(net_folder, '/deeplabv3plus_resnet18.mat'), 'net');
 
 %for i = 1:10
 %    read(imds)

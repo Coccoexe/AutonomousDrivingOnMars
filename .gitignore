@@ -1,3 +1,4 @@
 dataset/*
 src/DepthAnything/*
+src/deeplabv3plus/*
 srcTest/*
