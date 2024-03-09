@@ -56,12 +56,10 @@ net = trainNetwork(train_cds, layers, options);
 time = datetime("now", "Format", "yyMMdd-HHmm");
 save(strcat(net_folder, '/deeplabv3plus_resnet18_', string(time), '.mat'), 'net');
 
-
+% test network
 imds_test = imageDatastore(fullfile(test_folder, '*.png'));
 pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.png'), classes, labelIDs);
 test_cds = combine(imds_test,pxds_test);
-
-% test network
 pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
 
