@@ -8,8 +8,8 @@ test_folder    = strcat(dataset_folder, '/images/edr/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test/masked-gold-min2-100agree');
 
-dataset_name = 'dataset/ai4mars';
-image_size  = [256, 256];
+dataset_name = 'dataset/ai4mars513';
+image_size  = [513, 513];
 
 % DATASET FOLDERS GENERATION
 delete(strcat(dataset_name, '/*'));
