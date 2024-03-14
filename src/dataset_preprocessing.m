@@ -2,14 +2,14 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars-dataset-merged-0.1/msl';
-train_folder   = strcat(dataset_folder, '/images/edr/train');
-test_folder    = strcat(dataset_folder, '/images/edr/test');
+dataset_folder = 'dataset/ai4mars';
+train_folder   = strcat(dataset_folder, '/images/train');
+test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
-ltest_folder   = strcat(dataset_folder, '/labels/test/masked-gold-min2-100agree');
+ltest_folder   = strcat(dataset_folder, '/labels/test');
 
-dataset_name = 'dataset/ai4mars513';
-image_size  = [513, 513];
+dataset_name = 'dataset/ai4marsClosing';
+image_size  = [256, 256];
 
 % DATASET FOLDERS GENERATION
 delete(strcat(dataset_name, '/*'));
@@ -28,12 +28,14 @@ imdsl_train = imageDatastore(ltrain_folder);
 imdsl_test  = imageDatastore(ltest_folder);
 
 % PREPROCESS IMAGES
+kernel = strel('square', 20);
+closing = @(x) imclose(x, kernel);
 resize = @(x) imresize(x, image_size);
 duplicate = @(x) cat(3, x, x, x);
 imds_train.ReadFcn = @(x) duplicate(resize(imread(x)));
 imds_test.ReadFcn  = @(x) duplicate(resize(imread(x)));
-imdsl_train.ReadFcn = @(x) resize(imread(x));
-imdsl_test.ReadFcn  = @(x) resize(imread(x));
+imdsl_train.ReadFcn = @(x) resize(closing(imread(x)));
+imdsl_test.ReadFcn  = @(x) resize(closing(imread(x)));
 
 % SAVE IMAGES
 disp('Saving Train Images...');
