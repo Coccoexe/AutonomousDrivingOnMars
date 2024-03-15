@@ -18,7 +18,7 @@ def main():
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
 
-    # add color legend
+    # LEGEND -----------------------------------------------------------------------------------------------------
     legend = np.zeros((len(COLOR_MAP) * 22, 300, 3), dtype=np.uint8)
     i = 0
     for k, v in COLOR_MAP.items():
@@ -27,19 +27,22 @@ def main():
         i += 1
     cv2.imshow('legend', legend)
 
+
+    # GET IMAGES ------------------------------------------------------------------------------------------------
     images = os.listdir(IMAGES_PATH)
     print('Total images:', len(images))
     if KEEP_PROGRESS:
         images = [i for i in images if not os.path.exists(OUTPUT_PATH + i)]
         print('Remaining images:', len(images))
     
+    # LOOP IMAGES -----------------------------------------------------------------------------------------------
     for file in tqdm.tqdm(images):
         masks = glob.glob(MASK_PATH + file.replace('.jpg','') + '*.png')
         if len(masks) < 1: continue
 
+        img = cv2.imread(IMAGES_PATH + file, cv2.IMREAD_COLOR)                            
 
-        img = cv2.imread(IMAGES_PATH + file, cv2.IMREAD_COLOR)
-
+        # COLLAGE OF ALL MASKS ----------------------------------------------------------------------------------------------
         all_masks = np.zeros((img.shape[0], img.shape[1]*len(masks),3), dtype=np.uint8)
         for i in range(len(masks)):
             mask = cv2.imread(masks[i], cv2.IMREAD_GRAYSCALE)
@@ -50,22 +53,20 @@ def main():
 
             all_masks[:, i*img.shape[1]:(i+1)*img.shape[1]] = rgb_mask
 
-            # add label below mask
             cv2.putText(all_masks, str(i+1), (i*img.shape[1]+5, img.shape[0]-5), cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 0, 0), 6)
 
-        # resize to fit monitor
-        all_masks = cv2.resize(all_masks, (img.shape[1]*2, 2*img.shape[0]//len(masks)))
+        if len(masks) > 1:
+            all_masks = cv2.resize(all_masks, (img.shape[1]*2, 2*img.shape[0]//len(masks)))     # resize to fit in the screen
         
         cv2.imshow('img', img)
         cv2.imshow('mask', all_masks)
 
-        # loop until user press a valid key
+        # SAVE SELECTED MASK -----------------------------------------------------------------------------------------------
         input = 0
         while input < 49 or input > 48+len(masks):
             input = cv2.waitKey(0)
             if input < 49 or input > 48+len(masks):
                 print('Invalid input. Please press a number between 1 and', len(masks))
-
         cv2.imwrite(OUTPUT_PATH + file, cv2.imread(masks[input-49], cv2.IMREAD_GRAYSCALE))
 
         cv2.destroyWindow('img')
