@@ -2,7 +2,7 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars';
+dataset_folder = 'dataset/ai4marsClosing';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
@@ -50,7 +50,9 @@ options = trainingOptions('sgdm', ...
     'ValidationFrequency', validation_freq, ...
     'Shuffle', 'every-epoch', ...
     'Verbose', false, ...
-    'Plots', 'training-progress');
+    'Plots', 'training-progress', ...
+    'CheckpointPath', net_folder, ...
+    'CheckpointFrequency', 1);
 
 net = trainNetwork(train_cds, layers, options);
 
