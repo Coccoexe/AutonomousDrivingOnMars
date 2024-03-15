@@ -12,6 +12,8 @@ COLOR_MAP = {0: [0, 0, 0], 1: [128, 128, 128], 2: [0, 165, 255], 3: [0, 0, 255],
 
 OUTPUT_PATH = "dataset/MASKS/"
 
+KEEP_PROGRESS = True
+
 def main():
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
@@ -24,8 +26,14 @@ def main():
         cv2.rectangle(legend, (150, i*20), (300, (i+1)*20), tuple(v), -1)
         i += 1
     cv2.imshow('legend', legend)
+
+    images = os.listdir(IMAGES_PATH)
+    print('Total images:', len(images))
+    if KEEP_PROGRESS:
+        images = [i for i in images if not os.path.exists(OUTPUT_PATH + i)]
+        print('Remaining images:', len(images))
     
-    for file in tqdm.tqdm(os.listdir(IMAGES_PATH)):
+    for file in tqdm.tqdm(images):
         masks = glob.glob(MASK_PATH + file.replace('.jpg','') + '*.png')
         if len(masks) < 1: continue
 
