@@ -13,6 +13,7 @@ COLOR_MAP = {0: [0, 0, 0], 1: [128, 128, 128], 2: [0, 165, 255], 3: [0, 0, 255],
 OUTPUT_PATH = "dataset/MASKS/"
 
 KEEP_PROGRESS = True
+REVERSE_ORDER = True
 
 def main():
     if not os.path.exists(OUTPUT_PATH):
@@ -34,11 +35,16 @@ def main():
     if KEEP_PROGRESS:
         images = [i for i in images if not os.path.exists(OUTPUT_PATH + i)]
         print('Remaining images:', len(images))
+    if REVERSE_ORDER:
+        images = list(reversed(images))
     
     # LOOP IMAGES -----------------------------------------------------------------------------------------------
     for file in tqdm.tqdm(images):
         masks = glob.glob(MASK_PATH + file.replace('.jpg','') + '*.png')
         if len(masks) < 1: continue
+        if len(masks) == 1:
+            cv2.imwrite(OUTPUT_PATH + file, cv2.imread(masks[0], cv2.IMREAD_GRAYSCALE))
+            continue
 
         img = cv2.imread(IMAGES_PATH + file, cv2.IMREAD_COLOR)                            
 
