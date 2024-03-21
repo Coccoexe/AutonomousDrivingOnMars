@@ -40,7 +40,7 @@ def main():
     
     # LOOP IMAGES -----------------------------------------------------------------------------------------------
     for file in tqdm.tqdm(images):
-        masks = glob.glob(MASK_PATH + file.replace('.jpg','') + '*.png')
+        masks = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
         if len(masks) < 1: continue
         if len(masks) == 1:
             cv2.imwrite(OUTPUT_PATH + file, cv2.imread(masks[0], cv2.IMREAD_GRAYSCALE))
