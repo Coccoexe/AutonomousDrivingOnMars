@@ -8,8 +8,8 @@ test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
-dataset_name = 'dataset/ai4marsClosing';
-image_size  = [256, 256];
+dataset_name = 'dataset/ai4mars513';
+image_size  = [513, 513];
 
 % DATASET FOLDERS GENERATION
 delete(strcat(dataset_name, '/*'));
@@ -29,13 +29,15 @@ imdsl_test  = imageDatastore(ltest_folder);
 
 % PREPROCESS IMAGES
 kernel = strel('square', 20);
-closing = @(x) imclose(x, kernel);
+%closing = @(x) imclose(x, kernel);
 resize = @(x) imresize(x, image_size);
 duplicate = @(x) cat(3, x, x, x);
 imds_train.ReadFcn = @(x) duplicate(resize(imread(x)));
 imds_test.ReadFcn  = @(x) duplicate(resize(imread(x)));
-imdsl_train.ReadFcn = @(x) resize(closing(imread(x)));
-imdsl_test.ReadFcn  = @(x) resize(closing(imread(x)));
+%imdsl_train.ReadFcn = @(x) resize(closing(imread(x)));
+%imdsl_test.ReadFcn  = @(x) resize(closing(imread(x)));
+imdsl_train.ReadFcn = @(x) resize(imread(x));
+imdsl_test.ReadFcn  = @(x) resize(imread(x));
 
 % SAVE IMAGES
 disp('Saving Train Images...');
