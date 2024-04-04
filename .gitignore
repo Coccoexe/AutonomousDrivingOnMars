@@ -2,3 +2,4 @@ dataset/*
 src/DepthAnything/*
 srcTest/*
 src/deeplabv3plus/*
+src/prof_pretrained/*
