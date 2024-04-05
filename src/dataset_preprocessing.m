@@ -2,14 +2,14 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars';
+dataset_folder = 'dataset/ai4mars4';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
-dataset_name = 'dataset/ai4mars513';
-image_size  = [513, 513];
+dataset_name = 'dataset/ai4marsNEW';
+image_size  = [256, 256];
 
 % DATASET FOLDERS GENERATION
 delete(strcat(dataset_name, '/*'));

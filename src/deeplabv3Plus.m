@@ -2,12 +2,12 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4marsClosing';
+dataset_folder = 'dataset/ai4marsNEW';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
-net_folder     = 'src/deeplabv3plus/trained_networks';
+net_folder     = 'src/deeplabv3plus/trained_networks/resnet18/';
 
 
 image_size  = [256, 256, 3];
