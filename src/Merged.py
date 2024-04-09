@@ -3,9 +3,8 @@ import cv2
 import glob
 import tqdm
 import numpy as np
-from Ai4MarsUtils import err, gray2color
-import sys
-from sklearn.metrics import jaccard_score
+from Ai4MarsUtils import err, gray2color_s
+#from sklearn.metrics import jaccard_score
 
 
 IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
@@ -17,7 +16,7 @@ LABEL = [0,1,2,3,255]
 
 AGREEMENT = 0.65
 NUM_PIXELS = 1048576                                                    # 1024x1024
-
+THRESHOLD_IMG = 2
 def mergeRule(masks: list[np.array]) -> np.array:
     if len(masks) <= 2:
         err("\nError: No masks to merge")
@@ -37,7 +36,7 @@ def mergeRule(masks: list[np.array]) -> np.array:
             max_key = max(occurrences_map, key=occurrences_map.get)     # get key with max value
             num_lbl = sum(occurrences_map.values())                     # get total number of labels
             
-            if occurrences_map[max_key] < 3: continue                   # first rule: at least 3 labelers agree
+            if occurrences_map[max_key] < THRESHOLD_IMG: continue                   # first rule: at least 3 labelers agree
             if occurrences_map[max_key]/num_lbl < AGREEMENT: continue   # second rule: at least 65% of labelers agree
             
             output_mask[i,j] = max_key
@@ -46,12 +45,17 @@ def mergeRule(masks: list[np.array]) -> np.array:
     
 def main():
     
+    
+    
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
 
     images = os.listdir(IMAGES_PATH)                                # get all images names
     
+    count = 0
     for file in tqdm.tqdm(images):
+        count += 1
+        if count < 280: continue
         masks_paths = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
         if len(masks_paths) < 1: continue
         
@@ -71,8 +75,10 @@ def main():
         diff = cv2.absdiff(new_mask, ground_truth)
         if np.any(diff):
             print("\nDifferences found in ", file)
-        else :
-            print("\nNo differences found in ", file)
+        
+        #cv2.imshow('ground_truth', gray2color_s(ground_truth))
+        #cv2.imshow('new_mask', gray2color_s(new_mask))
+        #cv2.waitKey(0)
         #cv2.imshow('diff', diff)
         #cv2.waitKey(0)
         
