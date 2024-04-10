@@ -7,11 +7,11 @@ def err(message: str) -> None:
     print('\033[91m' + message + '\033[0m')
     return
 
-def gray2color_s(img: np.array) -> np.array:
-        colored = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-        for k, v in COLOR_MAP.items():
-            colored[img == k] = v
-        return colored
-    
-def gray2color(imgs: list[np.array]) -> list[np.array]:
-        return [gray2color_s(img) for img in imgs]
+def gray2color(img: np.array) -> np.array:
+    colored = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+    for k, v in COLOR_MAP.items():
+        colored[img == k] = v
+    return colored
+
+def gray2color_list(imgs: list[np.array]) -> list[np.array]:
+    return [gray2color(img) for img in imgs]

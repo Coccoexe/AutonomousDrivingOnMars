@@ -3,9 +3,10 @@ import cv2
 import glob
 import tqdm
 import numpy as np
-from Ai4MarsUtils import err, gray2color_s
-#from sklearn.metrics import jaccard_score
+from Ai4MarsUtils import err, gray2color
+from skimage.measure import label, regionprops
 
+DEBUG = True
 
 IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
 LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
@@ -17,6 +18,8 @@ LABEL = [0,1,2,3,255]
 AGREEMENT = 0.65
 NUM_PIXELS = 1048576                                                    # 1024x1024
 THRESHOLD_IMG = 2
+
+
 def mergeRule(masks: list[np.array]) -> np.array:
     if len(masks) <= 2:
         err("\nError: No masks to merge")
@@ -36,16 +39,17 @@ def mergeRule(masks: list[np.array]) -> np.array:
             max_key = max(occurrences_map, key=occurrences_map.get)     # get key with max value
             num_lbl = sum(occurrences_map.values())                     # get total number of labels
             
-            if occurrences_map[max_key] < THRESHOLD_IMG: continue                   # first rule: at least 3 labelers agree
+            if occurrences_map[max_key] < THRESHOLD_IMG: continue       # first rule: at least 3 labelers agree
             if occurrences_map[max_key]/num_lbl < AGREEMENT: continue   # second rule: at least 65% of labelers agree
             
             output_mask[i,j] = max_key
     
     return output_mask
+
+
+            
     
 def main():
-    
-    
     
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
@@ -56,6 +60,7 @@ def main():
     for file in tqdm.tqdm(images):
         count += 1
         if count < 280: continue
+        count = 0
         masks_paths = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
         if len(masks_paths) < 1: continue
         
@@ -64,27 +69,26 @@ def main():
             mask = cv2.imread(masks_paths[i], cv2.IMREAD_GRAYSCALE)
             masks.append(mask)
         
-        # save new mask
+
         new_mask = mergeRule(masks)
         #check if new mask is empty
         if new_mask.size == 0: continue
-        cv2.imwrite(OUTPUT_PATH + file.replace('.JPG','_merged.png'), new_mask)
 
         # check differences
         ground_truth = cv2.imread(LABELS_PATH+file.replace('.JPG','') + '.png', cv2.IMREAD_GRAYSCALE)
         diff = cv2.absdiff(new_mask, ground_truth)
         if np.any(diff):
             print("\nDifferences found in ", file)
+
+        if DEBUG:
+            cv2.imshow("original mask", gray2color(ground_truth))
+            cv2.imshow("new mask", gray2color(new_mask))
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        else:
+            cv2.imwrite(OUTPUT_PATH + file.replace('.JPG','_merged.png'), new_mask)
         
-        #cv2.imshow('ground_truth', gray2color_s(ground_truth))
-        #cv2.imshow('new_mask', gray2color_s(new_mask))
-        #cv2.waitKey(0)
-        #cv2.imshow('diff', diff)
-        #cv2.waitKey(0)
-        
-        # calculate IoU multicalss
-        #iou = jaccard_score(ground_truth.flatten(), new_mask.flatten(), average='macro')
-        #print("\nIoU is ", iou)
+
 
     return
 

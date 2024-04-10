@@ -1,3 +1,5 @@
+__pycache__/*
+
 dataset/*
 src/DepthAnything/*
 srcTest/*
