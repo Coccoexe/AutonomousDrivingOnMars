@@ -9,6 +9,9 @@ LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
 MASK_PATH = "dataset/ai4mars-dataset-unmerged/msl/train/"
 OUTPUT_PATH = "dataset/NEW_ROCKS/"
 
+ROVER_MASKS = "dataset/ai4mars-dataset-merged-0.3/msl/images/mxy"
+HORIZON_MASKS ="dataset/ai4mars-dataset-merged-0.3/msl/images/rng-30m"
+
 PERCENT_SINGLE = 0.7
 NUM_PIXELS = 1048576 # 1024x1024
 EPSILON = 0.2
@@ -58,6 +61,13 @@ def multiple_mask_extraction(imgs, ground_truth):
 
     return True
 
+def merge_mask(ground_truth, rover_mask, horizon_mask):
+    ground_truth[rover_mask == 1] = 255
+    ground_truth[horizon_mask == 1] = 255
+    
+    return True
+
+
 def main():
     if not os.path.exists(OUTPUT_PATH):
             os.makedirs(OUTPUT_PATH)
@@ -67,10 +77,12 @@ def main():
     
     # LOOP IMAGES -----------------------------------------------------------------------------------------------
     for file in tqdm.tqdm(images):
-        masks = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
+
+        filename = file.replace('.JPG','')
+        masks = glob.glob(MASK_PATH + filename + '*.png')
         if len(masks) < 1: continue
         img = cv2.imread(IMAGES_PATH + file, cv2.IMREAD_COLOR)
-        ground_truth = cv2.imread(LABELS_PATH+file.replace('.JPG','') + '.png', cv2.IMREAD_GRAYSCALE)
+        ground_truth = cv2.imread(LABELS_PATH + filename + '.png', cv2.IMREAD_GRAYSCALE)
 
         rocks_masks = []
         for i in range(len(masks)):
@@ -83,9 +95,14 @@ def main():
             if not single_mask_extraction(rocks_masks[0], ground_truth): continue
         else:
             multiple_mask_extraction(rocks_masks, ground_truth)
+        
+        # merge with rover and horizon masks
+        rover_mask = cv2.imread(ROVER_MASKS + filename + '.png', cv2.IMREAD_GRAYSCALE)
+        horizon_mask = cv2.imread(HORIZON_MASKS + filename + '.png', cv2.IMREAD_GRAYSCALE)
+        merge_mask(ground_truth, rover_mask, horizon_mask)
 
         # save new ground truth
-        cv2.imwrite(OUTPUT_PATH + file.replace('.JPG','') + '.png', ground_truth)
+        cv2.imwrite(OUTPUT_PATH + filename + '.png', ground_truth)
 
     return
 
