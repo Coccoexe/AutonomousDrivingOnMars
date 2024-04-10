@@ -4,7 +4,7 @@ import glob
 import tqdm
 import numpy as np
 from Ai4MarsUtils import err, gray2color_s
-#from sklearn.metrics import jaccard_score
+from sklearn.metrics import jaccard_score
 
 wd = os.getcwd()
 wd = os.path.dirname(wd)
@@ -15,6 +15,9 @@ IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
 LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
 MASK_PATH = "dataset/ai4mars-dataset-unmerged/msl/train/"
 OUTPUT_PATH = "dataset/NEW_MERGED/"
+
+LABEL = [0,1,2,3,255]
+
 
     
 def main():
@@ -39,12 +42,9 @@ def main():
         cv2.imshow('ground_truth', gray2color_s(ground_truth))
         cv2.imshow('new_mask', gray2color_s(new_mask))
         cv2.waitKey(0)
-        #cv2.imshow('diff', diff)
-        #cv2.waitKey(0)
         
-        # calculate IoU multicalss
-        #iou = jaccard_score(ground_truth.flatten(), new_mask.flatten(), average='macro')
-        #print("\nIoU is ", iou)
+        #calculate jaccard score
+        j_score = jaccard_score(ground_truth.flatten(), new_mask.flatten(),labels=LABEL,zero_division=1)
 
     return
 
