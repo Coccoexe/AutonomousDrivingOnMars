@@ -17,12 +17,13 @@ OUTPUT_PATH = "dataset/NEW_MERGED/"
 
 LABEL = [0,1,2,3,255]
 
-AGREEMENT = 0.65
+AGREEMENT = 0.60
 NUM_PIXELS = 1048576                                                    # 1024x1024
 THRESHOLD_IMG = 2
 PERCENT_SINGLE = 0.7
 EPSILON = 0.2
 
+OUTLIERS = [line for line in open("outliers.txt", "r").readlines() if line != '']
 
 def mergeRule(masks: list[np.array]) -> np.array:
     if len(masks) <= 2:
@@ -92,9 +93,16 @@ def main():
         masks =[]
         rocks_masks = []
         for i in range(len(masks_paths)):
+
+            # check outliers
+            if masks_paths[i].split('_')[-1].replace('.png','') in OUTLIERS: 
+                continue
+
             mask = cv2.imread(masks_paths[i], cv2.IMREAD_GRAYSCALE)
             masks.append(mask)
             if 3 in mask: rocks_masks.append(i)
+
+        if len(rocks_masks) < 1: continue
         
         new_mask = mergeRule(masks)    # merge masks
 
