@@ -12,12 +12,10 @@ IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
 LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
 MASK_PATH = "dataset/ai4mars-dataset-unmerged/msl/train/"
 OUTPUT_PATH = "dataset/NEW_MERGED/"
-OUTLIER_NAME_FILE = "outlier_labelers_weight.csv"
-
 
 LABEL = [0,1,2,3,255]
 
-AGREEMENT = 0.55
+AGREEMENT = 0.65
 NUM_PIXELS = 1048576                                                    # 1024x1024
 THRESHOLD_IMG = 2
 
@@ -48,35 +46,26 @@ def mergeRule(masks: list[np.array]) -> np.array:
     
     return output_mask
 
-def populateNameOutliers():
-    global outlier_name
-    if os.path.exists(OUTLIER_NAME_FILE):
-        with open(OUTLIER_NAME_FILE, 'r') as f:
-            outlier_name = f.read().splitlines()
-    return
+
             
     
 def main():
     
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
-        
-    populateNameOutliers()
 
     images = os.listdir(IMAGES_PATH)                                # get all images names
     
-    #count = 0
+    count = 0
     for file in tqdm.tqdm(images):
-        #count += 1
-        #if count < 280: continue                                    # skip first 280 images
-        #count = 0
+        count += 1
+        if count < 280: continue
+        count = 0
         masks_paths = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
         if len(masks_paths) < 1: continue
         
         masks =[]
         for i in range(len(masks_paths)):
-            labeler = masks_paths[i].split('_')[-1][:-4]
-            if labeler in outlier_name: continue                       # check if labeler is an outlier
             mask = cv2.imread(masks_paths[i], cv2.IMREAD_GRAYSCALE)
             masks.append(mask)
         

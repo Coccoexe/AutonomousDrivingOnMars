@@ -65,11 +65,11 @@ def main():
 
     images = os.listdir(IMAGES_PATH)                                # get all images names
     
-    count = 0
+    #count = 0
     for file in tqdm.tqdm(images):
-        count += 1
-        if count < 280: continue
-        count = 0
+        #count += 1
+        #if count < 280: continue
+        #count = 0
         masks_paths = glob.glob(MASK_PATH + file.replace('.JPG','') + '*.png')
         if len(masks_paths) < 1: continue
         
