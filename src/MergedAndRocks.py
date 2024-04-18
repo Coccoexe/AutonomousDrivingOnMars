@@ -6,7 +6,9 @@ import numpy as np
 from Ai4MarsUtils import err, gray2color
 from skimage.measure import label, regionprops
 
-DEBUG = True
+DEBUG = False
+REVERSE = False
+RESTART = False # CAREFUL: it takes a lot
 
 IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
 LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
@@ -27,7 +29,7 @@ OUTLIERS = [line for line in open("outliers.txt", "r").readlines() if line != ''
 
 def mergeRule(masks: list[np.array]) -> np.array:
     if len(masks) <= 2:
-        err("\nError: No masks to merge")
+        #err("\nError: No masks to merge")
         return np.array([])
     
     output_mask = np.full(masks[0].shape, 255, dtype=np.uint8)          # define output mask
@@ -83,6 +85,9 @@ def main():
         os.makedirs(OUTPUT_PATH)
 
     images = os.listdir(IMAGES_PATH)                                # get all images names
+    done = os.listdir(OUTPUT_PATH)
+    if not RESTART: images = [img for img in images if img.replace('.JPG','_merged.png') not in done]
+    if REVERSE: images.reverse()
     
     for file in tqdm.tqdm(images):
         filename = file.replace('.JPG','')
@@ -102,7 +107,7 @@ def main():
             masks.append(mask)
             if 3 in mask: rocks_masks.append(i)
 
-        if len(rocks_masks) < 1: continue
+        #if len(rocks_masks) < 1: continue
         
         new_mask = mergeRule(masks)    # merge masks
 
