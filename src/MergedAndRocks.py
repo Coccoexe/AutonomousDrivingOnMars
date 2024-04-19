@@ -15,11 +15,11 @@ LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
 ROVER_MASKS = "dataset/ai4mars-dataset-merged-0.3/msl/images/mxy"
 HORIZON_MASKS ="dataset/ai4mars-dataset-merged-0.3/msl/images/rng-30m"
 MASK_PATH = "dataset/ai4mars-dataset-unmerged/msl/train/"
-OUTPUT_PATH = "dataset/NEW_MERGED/"
+OUTPUT_PATH = "dataset/NEW_MERGED_OPT/"
 
 LABEL = [0,1,2,3,255]
 
-AGREEMENT = 0.60
+AGREEMENT = 0.55
 NUM_PIXELS = 1048576                                                    # 1024x1024
 THRESHOLD_IMG = 2
 PERCENT_SINGLE = 0.7
@@ -28,9 +28,14 @@ EPSILON = 0.2
 OUTLIERS = [line for line in open("outliers.txt", "r").readlines() if line != '']
 
 def mergeRule(masks: list[np.array]) -> np.array:
-    if len(masks) <= 2:
+
+    if len(masks) < THRESHOLD_IMG:
         #err("\nError: No masks to merge")
-        return np.array([])
+        if len(masks) != 0:
+            ret = np.full(masks[0].shape, 255, dtype=np.uint8)
+        else:
+            ret = np.full((1024, 1024), 255, dtype=np.uint8)
+        return ret
     
     output_mask = np.full(masks[0].shape, 255, dtype=np.uint8)          # define output mask
 
@@ -53,6 +58,32 @@ def mergeRule(masks: list[np.array]) -> np.array:
     
     return output_mask
 
+def OptimizedMergeRule(masks: list[np.array]) -> np.array:
+    if len(masks) < THRESHOLD_IMG:
+        #err("\nError: No masks to merge")
+        if len(masks) != 0:
+            ret = np.full(masks[0].shape, 255, dtype=np.uint8)
+        else:
+            ret = np.full((1024, 1024), 255, dtype=np.uint8)
+        return ret
+    
+    output_mask = np.full(masks[0].shape, 255, dtype=np.uint8)          # define output mask
+
+    occurrences_maps = np.zeros((len(masks),) + masks[0].shape + (len(LABEL),), dtype=np.uint8)
+    for idx, mask in enumerate(masks):
+        for i in range(len(LABEL)):
+            occurrences_maps[idx,:,:,i] = mask == i
+
+    occurrences_map_sum = np.sum(occurrences_maps, axis=0)
+    total_labels = np.sum(occurrences_map_sum, axis=2)
+    max_occurrences = np.max(occurrences_map_sum, axis=2)
+
+    valid_pixels = np.logical_and(max_occurrences >= THRESHOLD_IMG, 
+                               np.where(total_labels != 0, max_occurrences / total_labels >= AGREEMENT, False))
+    output_mask[valid_pixels] = np.argmax(occurrences_map_sum, axis=2)[valid_pixels]
+    
+    return output_mask
+
 def single_mask_extraction(mask, ground_truth) -> bool:
     equal_pixels = np.sum(mask == ground_truth)
     if (equal_pixels / NUM_PIXELS) < PERCENT_SINGLE:
@@ -71,7 +102,7 @@ def multiple_mask_extraction(imgs, ground_truth):
     
     ground_truth[rocks > np.random.rand(1)] = 3
 
-    return True 
+    return True
 
 def merge_mask(ground_truth, rover_mask, horizon_mask):
     ground_truth[rover_mask == 1] = 255
@@ -109,12 +140,16 @@ def main():
 
         #if len(rocks_masks) < 1: continue
         
-        new_mask = mergeRule(masks)    # merge masks
+
+        #new_mask = mergeRule(masks)    # merge masks
+        new_mask = OptimizedMergeRule(masks)
+    
 
         if len(rocks_masks) == 1:
             single_mask_extraction(masks[rocks_masks[0]], new_mask)
         elif len(rocks_masks) > 1:
             multiple_mask_extraction([masks[i] for i in rocks_masks], new_mask)
+
 
         #check if new mask is empty
         if new_mask.size == 0: continue
