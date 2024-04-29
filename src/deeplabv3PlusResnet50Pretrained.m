@@ -2,12 +2,12 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars513';
+dataset_folder = 'dataset/ai4mars_preprocessed_NEW_MERGED_OPT';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
-net_folder     = 'src/prof_pretrained/trained_netrowks';
+net_folder     = 'src/deeplabv3plus/trained_networks/';
 
 
 image_size  = [513, 513, 3];
@@ -39,7 +39,7 @@ val_cds   = combine(imds_val,pxds_val);
 validation_freq = floor(length(train)/8);
 
 % train deeplabv3+ with resnet 101
-net = load('src/prof_pretrained/deepLabV3Plus-voc.mat');
+net = load('src/deeplabv3plus/model-Pretrained/deepLabV3Plus-voc.mat');
 net = net.net;
 layers = layerGraph(net);
 
