@@ -3,48 +3,37 @@ import cv2
 import glob
 import tqdm
 import numpy as np
-from Ai4MarsUtils import err, gray2color_s
-from sklearn.metrics import jaccard_score
+from Ai4MarsUtils import err, gray2color
 
 wd = os.getcwd()
 wd = os.path.dirname(wd)
 wd = os.path.dirname(wd)
 
 
-IMAGES_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/images/edr/"
-LABELS_PATH = "dataset/ai4mars-dataset-merged-0.3/msl/labels/train/"
-MASK_PATH = "dataset/ai4mars-dataset-unmerged/msl/train/"
-OUTPUT_PATH = "dataset/NEW_MERGED/"
-
-LABEL = [0,1,2,3,255]
-
-
+IMAGES_PATH = "dataset/ai4mars_preprocessed_ai4mars_ORIGINAL/images/test/"
+LABELS_PATH = "dataset/ai4mars_preprocessed_ai4mars_ORIGINAL/labels/test/"
+OUTPUT_PATH = "predictions/deeplabv3plus_resnet18_240501-1607/semanticsegOutput/"
     
 def main():
   
-    if not os.path.exists(OUTPUT_PATH):
-        os.makedirs(OUTPUT_PATH)
-
-    images = os.listdir(IMAGES_PATH)                                # get all images names
+    images = os.listdir(OUTPUT_PATH)                                # get all images names
     
-    count = 0
     for file in tqdm.tqdm(images):
-        count += 1
-        if count < 281: continue
-        if not os.path.exists(OUTPUT_PATH+file.replace('.JPG','') + '_merged.png'):
-            continue
-        
-        new_mask = cv2.imread(OUTPUT_PATH+file.replace('.JPG','') + '_merged.png', cv2.IMREAD_GRAYSCALE)
-        
-        ground_truth = cv2.imread(LABELS_PATH+file.replace('.JPG','') + '.png', cv2.IMREAD_GRAYSCALE)
+        name = file.split('_')[-1]
+        image = cv2.imread(IMAGES_PATH+name)
+        gt = cv2.imread(LABELS_PATH+name, cv2.IMREAD_GRAYSCALE)
+        pred = cv2.imread(OUTPUT_PATH+file, cv2.IMREAD_GRAYSCALE)
 
+        pred[pred == 1] = 0
+        pred[pred == 2] = 1
+        pred[pred == 3] = 2
+        pred[pred == 4] = 3
+        pred[pred == 5] = 255
         
-        cv2.imshow('ground_truth', gray2color_s(ground_truth))
-        cv2.imshow('new_mask', gray2color_s(new_mask))
+        cv2.imshow('image', image)
+        cv2.imshow('ground_truth', gray2color(gt))
+        cv2.imshow('pred', gray2color(pred))
         cv2.waitKey(0)
-        
-        #calculate jaccard score
-        j_score = jaccard_score(ground_truth.flatten(), new_mask.flatten(),labels=LABEL,zero_division=1)
 
     return
 

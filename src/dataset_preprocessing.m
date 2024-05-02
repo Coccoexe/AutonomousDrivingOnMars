@@ -2,16 +2,16 @@ clear all
 clc
 
 % DATASET PREPROCESSING
-DATASET_NAME = 'NEW_MERGED_OPT';
+DATASET_NAME = 'ai4mars_ORIGINAL';
 % CONFIGURATION
-dataset_folder = strcat('dataset/ai4mars_data_prep_',DATASET_NAME);
+dataset_folder = strcat('dataset/',DATASET_NAME);
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
 dataset_name = strcat('dataset/ai4mars_preprocessed_',DATASET_NAME);
-image_size  = [513, 513];
+image_size  = [256, 256];
 
 % DATASET FOLDERS GENERATION
 delete(strcat(dataset_name, '/*'));

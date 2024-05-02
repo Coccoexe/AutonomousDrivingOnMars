@@ -2,7 +2,7 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars_preprocessed_NEW_MERGED_OPT';
+dataset_folder = 'dataset/ai4mars_preprocessed_256NEW_MERGED_OPT';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');

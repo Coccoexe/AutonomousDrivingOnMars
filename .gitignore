@@ -1,6 +1,7 @@
 __pycache__/*
 
 dataset/*
+predictions/*
 src/DepthAnything/*
 srcTest/*
 src/deeplabv3plus/*

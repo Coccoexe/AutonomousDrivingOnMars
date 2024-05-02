@@ -4,10 +4,10 @@ import shutil
 # CONSTANTS
 
 DATA_FOLDER = os.getcwd() + "/dataset/"
-DATASET_PATH = DATA_FOLDER + "ai4mars-dataset-merged-0.4/"
+DATASET_PATH = DATA_FOLDER + "ai4mars-dataset-merged-0.3/"
 IMAGES_PATH = DATASET_PATH + "msl/images/edr/"
 LABELS_PATH = DATASET_PATH + "msl/labels/"
-OUTPUT_PATH = DATA_FOLDER + "ai4marsNEWROCKS/"
+OUTPUT_PATH = DATA_FOLDER + "ai4mars_ORIGINAL/"
 
 def rearrange_dataset() -> None:
     print("Rearranging dataset...")
