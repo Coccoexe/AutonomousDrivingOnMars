@@ -1,8 +1,6 @@
 __pycache__/*
 
 dataset/*
-predictions/*
-src/DepthAnything/*
+src/training/networks/*
+
 srcTest/*
-src/deeplabv3plus/*
-src/prof_pretrained/*
