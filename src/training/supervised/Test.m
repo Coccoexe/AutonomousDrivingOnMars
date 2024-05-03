@@ -1,8 +1,8 @@
 clear all
 clc
 
-test_images = 'dataset\ai4mars_preprocessed_TEST_SET_NOSTRO\images/test';
-test_labels = 'dataset\ai4mars_preprocessed_TEST_SET_NOSTRO\labels/test';
+test_images = 'dataset\ai4mars-dataset-merged-0.4-preprocessed-256\images/test';
+test_labels = 'dataset\ai4mars-dataset-merged-0.4-preprocessed-256\labels/test';
 
 net_folder     = 'src/training/networks/trained_netrowks/resnet18';
 trained_net = 'deeplabv3plus_resnet18_240501-1607.mat';
