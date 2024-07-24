@@ -2,7 +2,7 @@ clear all
 clc
 
 % DATASET PREPROCESSING
-DATASET_NAME = 'ai4mars_mer_msl_our';
+DATASET_NAME = 'S5Mars';
 % CONFIGURATION
 dataset_folder = strcat('dataset/',DATASET_NAME);
 train_folder   = strcat(dataset_folder, '/images/train');
@@ -35,8 +35,8 @@ kernel = strel('square', 20);
 
 resize = @(x) imresize(x, image_size);
 duplicate = @(x) cat(3, x, x, x);
-imds_train.ReadFcn = @(x) duplicate(resize(imread(x)));
-imds_test.ReadFcn  = @(x) duplicate(resize(imread(x)));
+imds_train.ReadFcn = @(x) resize(imread(x));
+imds_test.ReadFcn  = @(x) resize(imread(x));
 
 imdsl_train.ReadFcn = @(x) resize(imread(x));
 imdsl_test.ReadFcn  = @(x) resize(imread(x));

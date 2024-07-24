@@ -2,7 +2,7 @@ clear all
 clc
 
 % CONFIGURATION
-dataset_folder = 'dataset/ai4mars_mer_msl_our-preprocessed-256';
+dataset_folder = 'dataset/S5Mars-preprocessed-256';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
@@ -11,14 +11,14 @@ net_folder     = 'src/training/networks/trained_netrowks/resnet18';
 
 
 image_size  = [256, 256, 3];
-numClasses  = 5;
+numClasses  = 9;
 divideRatio = 0.8; % #images on train, validation is 1-divideRation
-epochPerTrain = 20;
+epochPerTrain = 50;
 learningRate = 1e-3;
 batchSize = 8;
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
-images = dir(fullfile(train_folder, '*.png'));
+images = dir(fullfile(train_folder, '*.jpg'));
 images = {images.name};
 %images = images(end:-1:1);
 images = images(randperm(length(images)));                            % shuffle images
@@ -29,8 +29,8 @@ val   = images(round(divideRatio*length(images))+1:end);              % validati
 imds_train = imageDatastore(fullfile(train_folder, train));
 imds_val   = imageDatastore(fullfile(train_folder, val));
 
-classes = ["soil","bedrock","sand","bigRock","noLabel"];
-labelIDs = [0, 1, 2, 3, 255];
+classes = ["sky","ridge","soil","sand","bedrock","rock","rover","trace","hole"];
+labelIDs = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 pxds_train = pixelLabelDatastore(fullfile(ltrain_folder, train), classes, labelIDs);
 pxds_val   = pixelLabelDatastore(fullfile(ltrain_folder, val), classes, labelIDs);
 
@@ -58,15 +58,18 @@ options = trainingOptions('sgdm', ...
     'CheckpointFrequency', 1);
 
 net = trainNetwork(train_cds, layers, options);
+t = string(time);
 
 % save network
 time = datetime("now", "Format", "yyMMdd-HHmm");
-save(strcat(net_folder, '/deeplabv3plus_resnet18_', string(time), '.mat'), 'net');
+save(strcat(net_folder, '/deeplabv3plus_S5MARS_resnet18_', t, '.mat'), 'net');
 
 % test network
-imds_test = imageDatastore(fullfile(test_folder, '*.png'));
-pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.png'), classes, labelIDs);
+imds_test = imageDatastore(fullfile(test_folder, '*.jpg'));
+pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.jpg'), classes, labelIDs);
 test_cds = combine(imds_test,pxds_test);
 pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
+
+save(strcat(net_folder, '/metrics_S5Mars_', t, '.mat'), 'metrics');
 

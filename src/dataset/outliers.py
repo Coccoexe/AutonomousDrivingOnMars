@@ -30,6 +30,7 @@ df['labeler'] = df['labeler'].astype(str)
 df['weight'] = df['weight'].replace(',', '.')
 df['weight'] = df['weight'].astype(float)
 dimension = 1024*1024
+dimension = dimension**2
 df['weight'] = df['weight']/dimension*100
 
 

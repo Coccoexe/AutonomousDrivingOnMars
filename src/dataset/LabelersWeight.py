@@ -53,7 +53,7 @@ def main():
                 labelers[labeler].append(dice_losses)
     
     for key in labelers:
-        total_diff = labelers[key][0]/(labelers[key][1]/(1024*1024))
+        total_diff = labelers[key][0]/(labelers[key][1]*(1024*1024))
         dice_loss_total = []
         for i in range(len(labelers[key][2])):
             dice_loss_total.append(labelers[key][2][i]/labelers[key][1])
