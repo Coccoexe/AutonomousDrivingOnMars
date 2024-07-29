@@ -4,8 +4,11 @@ dataset/*
 src/training/networks/*
 src/positiveNegative/*
 
-srcTest/*
+
 src/semisupervised/positiveNegativeDataset/*
 src/semisupervised/TunedModel/*
 
+srcTest/DepthAnything/*
+srcTest/MATLABPaDiM/ConcreteCrackDataset/*
 
+srcTest/deepLabV3Plus-voc.mat
