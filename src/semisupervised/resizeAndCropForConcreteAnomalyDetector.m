@@ -5,6 +5,7 @@
 
 % Initialize outputs
 if size(imageIn,3) == 1
+    imageIn = repmat(imageIn, [1 1 3 1]);
     imageOut = zeros([targetSize 3 size(imageIn,4)],'like',imageIn);
 else
     imageOut = zeros([targetSize size(imageIn,[3 4])],'like',imageIn);
