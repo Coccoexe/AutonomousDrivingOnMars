@@ -1,7 +1,10 @@
 __pycache__/*
 
 dataset/*
-src/training/networks/*
+src/supervised/Ai4Mars/networks/*
+src/supervised/depth/checkpoint/*
+src/supervised/depth/trained_networks/*
+src/unsupervised/output/*
 src/positiveNegative/*
 
 

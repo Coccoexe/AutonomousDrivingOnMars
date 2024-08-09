@@ -10,7 +10,7 @@ test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
-image_size  = [256, 256];
+image_size  = [512, 512];
 dataset_name = strcat('dataset/',DATASET_NAME,'-preprocessed-',num2str(image_size(1)));
 
 
@@ -46,6 +46,7 @@ disp('Saving Train Images...');
 for i = 1:length(imds_train.Files)
     name = split(imds_train.Files{i},'\');
     name = name{end};
+    name = replace(name,'jpg','png');
     img = read(imds_train);
     imwrite(img, strcat(dataset_name, '/images/train/', name)); %num2str(i),'.png'));
 end
@@ -53,6 +54,7 @@ disp('Saving Test Images...');
 for i = 1:length(imds_test.Files)
     name = split(imds_train.Files{i},'\');
     name = name{end};
+    name = replace(name,'jpg','png');
     img = read(imds_test);
     imwrite(img, strcat(dataset_name, '/images/test/', name)); %num2str(i),'.png'));
 end
@@ -60,6 +62,7 @@ disp('Saving Train Labels...');
 for i = 1:length(imdsl_train.Files)
     name = split(imds_train.Files{i},'\');
     name = name{end};
+    name = replace(name,'jpg','png');
     img = read(imdsl_train);
     imwrite(img, strcat(dataset_name, '/labels/train/', name)); %num2str(i),'.png'));
 end
@@ -67,6 +70,7 @@ disp('Saving Test Labels...');
 for i = 1:length(imdsl_test.Files)
     name = split(imds_train.Files{i},'\');
     name = name{end};
+    name = replace(name,'jpg','png');
     img = read(imdsl_test);
     imwrite(img, strcat(dataset_name, '/labels/test/', name)); %num2str(i),'.png'));
 end
