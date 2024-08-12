@@ -4,6 +4,8 @@ divideRatio = 0.8; % #images on train, validation is 1-divideRation
 epochPerTrain = 200;
 learningRate = 1e-3;
 batchSize = 16;
+optimizer = 'adam';
+loss = 'crossentropy';
 
 rgbFolder = 'dataset/S5Mars-preprocessed-512/images/train/';
 depthFolder = 'dataset/S5Mars-depth-512/images/train/';
@@ -41,7 +43,7 @@ mkdir(chechpoint);
 
 validation_freq = floor(length(train)/batchSize);
 % train network
-options = trainingOptions('sgdm', ...
+options = trainingOptions(optimizer, ...
     'ExecutionEnvironment','auto',...
     'InitialLearnRate', learningRate, ...
     'MaxEpochs', epochPerTrain, ...
@@ -63,19 +65,19 @@ layers = load('src/supervised/depth/FuseResNet.mat','net').net;
 
 %loss= @(X,T) mean(generalizedDice(X,T));
 %train
-net = trainnet(ds_train,layers,"crossentropy",options);
+net = trainnet(ds_train,layers,loss,options);
 %net = trainNetwork(trainingData,layers,options);
 
 % save network
 time = datetime("now", "Format", "yyMMdd-HHmm");
 t = string(time);
-t = strcat(mfilename,t);
-mkdir(strcat('src/supervised/depth/trained_networks/', t));
-save(strcat('src/supervised/depth/trained_networks/', t, '/trainedNN.mat'), 'net');
+name = strcat(t,'_',optimizer,'_',loss,'_',epochPerTrain);
+mkdir(strcat('src/supervised/depth/trained_networks/', name));
+save(strcat('src/supervised/depth/trained_networks/', name, '/trainedNN.mat'), 'net');
 
 %save training image
-currentfig = findall(groot, 'Tag', 'NNET_CNN_TRAININGPLOT_UIFIGURE');
-savefig(currentfig,strcat('src/supervised/depth/trained_networks/', t,'/training.fig'));
+%currentfig = findall(groot, 'Tag', 'NNET_CNN_TRAININGPLOT_UIFIGURE');
+%savefig(currentfig,strcat('src/supervised/depth/trained_networks/', name,'/training.fig'));
 
 % test network
 rgbFolder_test = 'dataset/S5Mars-preprocessed-512/images/test/';
@@ -88,7 +90,7 @@ concatenate = @(x,y) cat(3,x,y);
 tds_test = transform(imds_test_rgb,ims_test_depth,concatenate);
 pxds_test = pixelLabelDatastore(fullfile(labelFolder_test, '*.png'), classes, labelIDs);
 test_cds = combine(tds_test,pxds_test);
-pxdsResults = semanticseg(tds_test, net, 'MiniBatchSize', batchSize, 'WriteLocation', tempdir, 'Verbose', false);
+pxdsResults = semanticseg(tds_test, net, 'MiniBatchSize', batchSize, 'WriteLocation', tempdir, 'Verbose', false, 'Classes', classes);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
 
-save(strcat('src/supervised/depth/trained_networks/', t, '/metrics.mat'), 'metrics');
+save(strcat('src/supervised/depth/trained_networks/', name, '/metrics.mat'), 'metrics');

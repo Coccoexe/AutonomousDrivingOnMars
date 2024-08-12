@@ -88,7 +88,7 @@ concatenate = @(x,y) cat(3,x,y);
 tds_test = transform(imds_test_rgb,ims_test_depth,concatenate);
 pxds_test = pixelLabelDatastore(fullfile(labelFolder_test, '*.png'), classes, labelIDs);
 test_cds = combine(tds_test,pxds_test);
-pxdsResults = semanticseg(tds_test, net, 'MiniBatchSize', batchSize, 'WriteLocation', tempdir, 'Verbose', false);
+pxdsResults = semanticseg(tds_test, net, 'MiniBatchSize', batchSize, 'WriteLocation', tempdir, 'Verbose', false, 'Classes', classes);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
 
 save(strcat('src/supervised/depth/trained_networks/', t, '/metrics.mat'), 'metrics');
