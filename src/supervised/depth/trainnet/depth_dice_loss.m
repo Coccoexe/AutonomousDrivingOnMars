@@ -53,6 +53,12 @@ options = trainingOptions('sgdm', ...
     'CheckpointPath', chechpoint, ...
     'CheckpointFrequency', 50);
 
+inputDepth = 6;
+inputTileSize = [256 256];
+unetNetwork = unet([inputTileSize inputDepth],10);
+
+
+
 %load net
 raw_net = load('src/supervised/depth/FuseResNet.mat').net;
 layers = load('src/supervised/depth/FuseResNet.mat','net').net;
@@ -60,10 +66,9 @@ layers = load('src/supervised/depth/FuseResNet.mat','net').net;
 %layers = connectLayers(layers,'softmax','classes');
 %layers = layerGraph(layers);
 %network = dlnetwork(layers);
-
 loss= @(X,T) mean(1-generalizedDice(X,T));
 %train
-net = trainnet(ds_train,layers,loss,options);
+net = trainnet(ds_train,layers,@modelLoss,options);
 %net = trainNetwork(trainingData,layers,options);
 
 % save network
