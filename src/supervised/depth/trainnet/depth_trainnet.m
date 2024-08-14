@@ -71,7 +71,7 @@ net = trainnet(ds_train,layers,loss,options);
 % save network
 time = datetime("now", "Format", "yyMMdd-HHmm");
 t = string(time);
-name = strcat(t,'_',optimizer,'_',loss,'_',epochPerTrain);
+name = strcat(string(t),'_',optimizer,'_',loss,'_',string(epochPerTrain));
 mkdir(strcat('src/supervised/depth/trained_networks/', name));
 save(strcat('src/supervised/depth/trained_networks/', name, '/trainedNN.mat'), 'net');
 
