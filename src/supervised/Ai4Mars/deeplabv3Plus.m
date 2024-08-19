@@ -1,26 +1,31 @@
 clear all
 clc
 
+% NETWORK
+backbone = 'resnet50'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
 
 % CONFIGURATION
 parent_folder  = 'src/supervised/ai4mars';
-dataset_folder = 'dataset/ai4mars-dataset-merged-0.3-preprocessed-256';
+dataset_folder = 'dataset/ai4mars-dataset-merged-0.3-preprocessed-512';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
 divideRatio = 0.8; % #images on train, validation is 1-divideRation
-epochPerTrain = 20;
+epochPerTrain = 200;
 learningRate = 1e-3;
 batchSize = 16;
 optimizer = 'adam';
+loss = 'crossentropy';
+image_size = [512 512];
 
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
+numClasses = length(labelIDs);
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
-images = dir(fullfile(train_folder, '*.jpg'));
+images = dir(fullfile(train_folder, '*.png'));
 images = {images.name};
 images = images(randperm(length(images)));                            % shuffle images
 train  = images(1:round(divideRatio*length(images)));                 % train images
@@ -35,8 +40,8 @@ train_cds = combine(imds_train,pxds_train);
 val_cds   = combine(imds_val,pxds_val);
 
 % LOAD NETWORK
-%layers = deeplabv3plusLayers(image_size, numClasses, 'resnet18');
-load(fullfile(parent_folder,'net.mat'));
+%layers = deeplabv3plus(image_size, numClasses, backbone);
+load(fullfile(parent_folder,'resnet50.mat'));
 
 % NETWORK OPTIONS
 chechpoint = strcat(parent_folder,"/checkpoint/");
@@ -55,7 +60,7 @@ options = trainingOptions(optimizer, ...
     'CheckpointFrequency', 50);
 
 % TRAIN NETWORK
-net = trainNetwork(train_cds, layers, options);
+net = trainnet(train_cds, layers, loss, options);
 
 % SAVE TRAINED NETWORK
 time = datetime("now", "Format", "yyMMdd-HHmm");

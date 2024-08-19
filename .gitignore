@@ -15,3 +15,4 @@ srcTest/DepthAnything/*
 srcTest/MATLABPaDiM/ConcreteCrackDataset/*
 
 srcTest/deepLabV3Plus-voc.mat
+*.mat

@@ -23,22 +23,19 @@ classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
-images = dir(fullfile(rgbFolder, '*.jpg'));
+images = dir(fullfile(rgbFolder, '*.png'));
 images = {images.name};
-for i = 1:length(images)
-    images(i) = erase(images(i), '.jpg');
-end
 images = images(randperm(length(images)));                           
 train  = images(1:round(divideRatio*length(images)));                 
 val   = images(round(divideRatio*length(images))+1:end);
 
 % DATASTORES
-imds_train_rgb = imageDatastore(fullfile(rgbFolder, strcat(train,'.jpg')));
-imds_train_depth = imageDatastore(fullfile(depthFolder, strcat(train,'.png')));
-imds_val_rgb = imageDatastore(fullfile(rgbFolder, strcat(val,'.jpg')));
-imds_val_depth = imageDatastore(fullfile(depthFolder, strcat(val,'.png')));
-pxds_train = pixelLabelDatastore(fullfile(labelFolder, strcat(train,'.jpg')), classes, labelIDs);
-pxds_val   = pixelLabelDatastore(fullfile(labelFolder, strcat(val,'.jpg')), classes, labelIDs);
+imds_train_rgb = imageDatastore(fullfile(rgbFolder, train));
+imds_train_depth = imageDatastore(fullfile(depthFolder, train));
+imds_val_rgb = imageDatastore(fullfile(rgbFolder, val));
+imds_val_depth = imageDatastore(fullfile(depthFolder, val));
+pxds_train = pixelLabelDatastore(fullfile(labelFolder, train), classes, labelIDs);
+pxds_val   = pixelLabelDatastore(fullfile(labelFolder, val), classes, labelIDs);
 concatenate = @(x,y) cat(3,x,y);
 tds_train = transform(imds_train_rgb,imds_train_depth,concatenate);
 tds_val = transform(imds_val_rgb,imds_val_depth,concatenate);
@@ -76,9 +73,9 @@ mkdir(strcat(parent_folder,'/trained_networks/', name));
 save(strcat(parent_folder, '/trained_networks/', name, '/trainedNN.mat'), 'net');
 
 % TEST NETWORK
-imds_test_rgb = imageDatastore(fullfile(rgbFolder_test, '*.jpg'));
+imds_test_rgb = imageDatastore(fullfile(rgbFolder_test, '*.png'));
 ims_test_depth = imageDatastore(fullfile(depthFolder_test, '*.png'));
-pxds_test = pixelLabelDatastore(fullfile(labelFolder_test, '*.jpg'), classes, labelIDs);
+pxds_test = pixelLabelDatastore(fullfile(labelFolder_test, '*.png'), classes, labelIDs);
 concatenate = @(x,y) cat(3,x,y);
 tds_test = transform(imds_test_rgb,ims_test_depth,concatenate);
 test_cds = combine(tds_test,pxds_test);

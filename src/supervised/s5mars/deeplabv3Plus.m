@@ -1,26 +1,31 @@
 clear all
 clc
 
+% NETWORK
+backbone = 'resnet50'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
 
 % CONFIGURATION
 parent_folder  = 'src/supervised/s5mars';
-dataset_folder = 'dataset/S5Mars-preprocessed-256';
+dataset_folder = 'dataset/S5Mars-preprocessed-512';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
 divideRatio = 0.8; % #images on train, validation is 1-divideRation
-epochPerTrain = 20;
+epochPerTrain = 200;
 learningRate = 1e-3;
 batchSize = 16;
 optimizer = 'adam';
+loss = 'crossentropy';
+image_size = [512 512];
 
 classes = ["null","sky","ridge","soil","sand","bedrock","rock","rover","trace","hole"];
 labelIDs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+numClasses = length(labelIDs);
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
-images = dir(fullfile(train_folder, '*.jpg'));
+images = dir(fullfile(train_folder, '*.png'));
 images = {images.name};
 images = images(randperm(length(images)));                            % shuffle images
 train  = images(1:round(divideRatio*length(images)));                 % train images
@@ -35,7 +40,8 @@ train_cds = combine(imds_train,pxds_train);
 val_cds   = combine(imds_val,pxds_val);
 
 % LOAD NETWORK
-load(fullfile(parent_folder,'net.mat'));
+%layers = deeplabv3plus(image_size, numClasses, backbone);
+load(fullfile(parent_folder,'resnet50.mat'));
 
 % NETWORK OPTIONS
 chechpoint = strcat(parent_folder,"/checkpoint/");
@@ -54,7 +60,7 @@ options = trainingOptions(optimizer, ...
     'CheckpointFrequency', 50);
 
 % TRAIN NETWORK
-net = trainNetwork(train_cds, layers, options);
+net = trainnet(train_cds, layers, loss, options);
 
 % SAVE TRAINED NETWORK
 time = datetime("now", "Format", "yyMMdd-HHmm");
@@ -64,8 +70,8 @@ mkdir(strcat(parent_folder,'/trained_networks/', name));
 save(strcat(parent_folder, '/trained_networks/', name, '/trainedNN.mat'), 'net');
 
 % TEST NETWORK
-imds_test = imageDatastore(fullfile(test_folder, '*.jpg'));
-pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.jpg'), classes, labelIDs);
+imds_test = imageDatastore(fullfile(test_folder, '*.png'));
+pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.png'), classes, labelIDs);
 test_cds = combine(imds_test,pxds_test);
 pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
