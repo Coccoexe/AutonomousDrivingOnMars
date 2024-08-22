@@ -1,7 +1,10 @@
 clear all
 clc
 
+backbone = 'FuseResNet';
+
 % CONFIGURATIOn
+base_network   = 'src/supervised/base_network';
 parent_folder = 'src/supervised/depth_s5mars';
 rgb_dataset_folder = 'dataset/S5Mars-preprocessed-512';
 depth_dataset_folder = 'dataset/S5Mars-depth-512';
@@ -21,6 +24,7 @@ loss = 'crossentropy';
 
 classes = ["null","sky","ridge","soil","sand","bedrock","rock","rover","trace","hole"];
 labelIDs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+numClasses = length(labelIDs);
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
 rgbImages = dir(fullfile(rgbFolder, '*.png'));
@@ -43,7 +47,8 @@ ds_train = combine(tds_train,pxds_train);
 ds_val = combine(tds_val,pxds_val);
 
 % LOAD NETWORK
-load(fullfile(parent_folder,'FuseResNet_10.mat'));
+net_name = fullfile(base_network,strcat(backbone,'_',int2str(numClasses),'.mat'));
+load(net_name);
 
 % NETWORK OPTIONS
 chechpoint = strcat("src/supervised/depth/checkpoint/");

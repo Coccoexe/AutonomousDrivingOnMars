@@ -1,7 +1,10 @@
 clear all
 clc
 
+backbone = 'FuseResNet';
+
 % CONFIGURATIOn
+base_network   = 'src/supervised/base_network';
 parent_folder = 'src/supervised/depth_ai4mars';
 rgb_dataset_folder = 'dataset/ai4mars-dataset-merged-0.4-preprocessed-512';
 depth_dataset_folder = 'dataset/ai4mars-depth-512';
@@ -21,6 +24,7 @@ loss = 'crossentropy';
 
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
+numClasses = length(labelIDs);
 
 % TAKES TRAIN IMAGES AND DIVIDES INTO TRAIN AND VALIDATION
 images = dir(fullfile(rgbFolder, '*.png'));
@@ -43,7 +47,8 @@ ds_train = combine(tds_train,pxds_train);
 ds_val = combine(tds_val,pxds_val);
 
 % LOAD NETWORK
-load(fullfile(parent_folder,'FuseResNet_5.mat'));
+net_name = fullfile(base_network,strcat(backbone,'_',int2str(numClasses),'.mat'));
+load(net_name);
 
 % NETWORK OPTIONS
 chechpoint = strcat("src/supervised/depth/checkpoint/");

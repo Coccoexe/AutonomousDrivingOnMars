@@ -2,9 +2,10 @@ clear all
 clc
 
 % NETWORK
-backbone = 'resnet50'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
+backbone = 'inceptionresnetv2'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
 
 % CONFIGURATION
+base_network   = 'src/supervised/base_network';
 parent_folder  = 'src/supervised/ai4mars';
 dataset_folder = 'dataset/ai4mars-dataset-merged-0.3-preprocessed-512';
 train_folder   = strcat(dataset_folder, '/images/train');
@@ -41,7 +42,8 @@ val_cds   = combine(imds_val,pxds_val);
 
 % LOAD NETWORK
 %layers = deeplabv3plus(image_size, numClasses, backbone);
-load(fullfile(parent_folder,'resnet50.mat'));
+net_name = fullfile(base_network,strcat(backbone,'_',int2str(numClasses),'.mat'));
+load(net_name);
 
 % NETWORK OPTIONS
 chechpoint = strcat(parent_folder,"/checkpoint/");
@@ -73,6 +75,6 @@ save(strcat(parent_folder, '/trained_networks/', name, '/trainedNN.mat'), 'net')
 imds_test = imageDatastore(fullfile(test_folder, '*.png'));
 pxds_test = pixelLabelDatastore(fullfile(ltest_folder, '*.png'), classes, labelIDs);
 test_cds = combine(imds_test,pxds_test);
-pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false);
+pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false, 'Classes', classes);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
 save(strcat(parent_folder,'/trained_networks/', name, '/metrics.mat'), 'metrics');
