@@ -16,3 +16,6 @@ srcTest/MATLABPaDiM/ConcreteCrackDataset/*
 
 srcTest/deepLabV3Plus-voc.mat
 *.mat
+papers/semisupervised/PlotNeuralNet-Master
+papers/semisupervised/PlotNeuralNet-Master.zip
+src\supervised\SegNet\segnet_d9_nopretrain.mat
