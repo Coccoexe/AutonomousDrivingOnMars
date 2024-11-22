@@ -2,7 +2,7 @@ clear all
 clc
 
 % DATASET PREPROCESSING
-DATASET_NAME = 'ai4mars-dataset-merged-0.4';
+DATASET_NAME = 'ai4mars-dataset-merged-0.4-augmented';
 % CONFIGURATION
 dataset_folder = strcat('dataset/',DATASET_NAME);
 train_folder   = strcat(dataset_folder, '/images/train');
@@ -10,7 +10,7 @@ test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
-image_size  = [256, 256];
+image_size  = [512, 512];
 dataset_name = strcat('dataset/',DATASET_NAME,'-preprocessed-',num2str(image_size(1)));
 
 

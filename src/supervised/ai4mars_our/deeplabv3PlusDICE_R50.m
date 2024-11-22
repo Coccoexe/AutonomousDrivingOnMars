@@ -1,25 +1,27 @@
 clear all
 clc
 
+addpath('src/supervised/loss/');
+
 % NETWORK
-backbone = 'resnet18'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
+backbone = 'resnet50'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
 
 % CONFIGURATION
 base_network   = 'src/supervised/base_network';
-parent_folder  = 'src/supervised/ai4mars';
-dataset_folder = 'dataset/ai4mars-dataset-merged-0.3-augmented-preprocessed-256';
+parent_folder  = 'src/supervised/ai4mars_our';
+dataset_folder = 'dataset/ai4mars-dataset-merged-0.4-preprocessed-512';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
 ltest_folder   = strcat(dataset_folder, '/labels/test');
 
 divideRatio = 0.8; % #images on train, validation is 1-divideRation
-epochPerTrain = 200;
-learningRate = 1e-3;
+epochPerTrain = 400;
+learningRate = 1e-4;
 batchSize = 16;
 optimizer = 'adam';
-loss = 'crossentropy';
-image_size = [256 256];
+loss = @diceLoss;
+image_size = [512 512];
 
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
@@ -67,8 +69,8 @@ net = trainnet(train_cds, layers, loss, options);
 % SAVE TRAINED NETWORK
 time = datetime("now", "Format", "yyMMdd-HHmm");
 name = strcat(string(time),'_',backbone);
-save(strcat(parent_folder,'/trained_networks/', name, '/config.mat'),'backbone','batchSize','dataset_folder','divideRatio','epochPerTrain','image_size','learningRate','loss','optimizer');
 mkdir(strcat(parent_folder,'/trained_networks/', name));
+save(strcat(parent_folder,'/trained_networks/', name, '/config.mat'),'backbone',"batchSize","dataset_folder","divideRatio","epochPerTrain","image_size","learningRate","loss","optimizer");
 save(strcat(parent_folder, '/trained_networks/', name, '/trainedNN.mat'), 'net');
 
 % TEST NETWORK
@@ -78,3 +80,4 @@ test_cds = combine(imds_test,pxds_test);
 pxdsResults = semanticseg(imds_test, net, 'MiniBatchSize', 8, 'WriteLocation', tempdir, 'Verbose', false, 'Classes', classes);
 metrics = evaluateSemanticSegmentation(pxdsResults, pxds_test, 'Verbose', false);
 save(strcat(parent_folder,'/trained_networks/', name, '/metrics.mat'), 'metrics');
+

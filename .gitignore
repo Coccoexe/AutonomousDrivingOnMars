@@ -7,6 +7,8 @@ src/supervised/depth/trained_networks/*
 src/unsupervised/output/*
 src/positiveNegative/*
 
+*.png
+*.jpg
 
 src/semisupervised/positiveNegativeDataset/*
 src/semisupervised/TunedModel/*

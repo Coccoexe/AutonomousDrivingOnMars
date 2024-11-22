@@ -2,12 +2,12 @@ clear all
 clc
 
 % NETWORK
-backbone = 'inceptionresnetv2'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
+backbone = 'resnet18'; %resnet18, resnet50, mobilenetv2 ,xception ,inceptionresnetv2
 
 % CONFIGURATION
 base_network   = 'src/supervised/base_network';
 parent_folder  = 'src/supervised/ai4mars_our';
-dataset_folder = 'dataset/ai4mars-dataset-merged-0.4-preprocessed-512';
+dataset_folder = 'dataset/ai4mars-dataset-merged-0.4-augmented-preprocessed-256';
 train_folder   = strcat(dataset_folder, '/images/train');
 test_folder    = strcat(dataset_folder, '/images/test');
 ltrain_folder  = strcat(dataset_folder, '/labels/train');
@@ -19,7 +19,7 @@ learningRate = 1e-3;
 batchSize = 16;
 optimizer = 'adam';
 loss = 'crossentropy';
-image_size = [512 512];
+image_size = [256 256];
 
 classes = ["soil","bedrock","sand","bigRock","noLabel"];
 labelIDs = [0, 1, 2, 3, 255];
@@ -66,8 +66,8 @@ net = trainnet(train_cds, layers, loss, options);
 
 % SAVE TRAINED NETWORK
 time = datetime("now", "Format", "yyMMdd-HHmm");
-t = string(time);
-name = strcat(string(t),'_',optimizer,'_',string(epochPerTrain));
+name = strcat(string(time),'_',backbone);
+save(strcat(parent_folder,'/trained_networks/', name, '/config.mat'),'backbone','batchSize','dataset_folder','divideRatio','epochPerTrain','image_size','learningRate','loss','optimizer');
 mkdir(strcat(parent_folder,'/trained_networks/', name));
 save(strcat(parent_folder, '/trained_networks/', name, '/trainedNN.mat'), 'net');
 
